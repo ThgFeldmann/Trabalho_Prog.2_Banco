@@ -86,6 +86,7 @@ class Pessoa:
     def Adicionar_Conta(self, nova_conta):
         self.contas.append(nova_conta)
 
+# Classe abstrata para as contas correntes e poupanças
 class Conta_Bancaria:
     def __init__(self, titular: Pessoa, banco: Banco, numero, saldo, senha):
         self.titular = Pessoa(titular)
@@ -93,24 +94,6 @@ class Conta_Bancaria:
         self.numero = numero
         self.saldo = saldo
         self.senha = senha
-    
-    #TODO Em desenvolvimento
-    @classmethod
-    def Construtor_Conta_Bancaria_Teclado(cls):
-        print("Digite o nome do Titular")
-        nome_titular = Entrada_De_Dado("")
-        print("Digite o número do Banco")
-        numero_banco = Entrada_De_Dado(0)
-        print("Digite o número da Conta")
-        numero_conta = Entrada_De_Dado(0)
-        print("Digite o saldo da Conta")
-        saldo = Entrada_De_Dado(0.00)
-        print("Digite a senha da Conta")
-        senha = Entrada_De_Dado("")
-        
-        #TODO Criar verificações / extrair o titular e o banco
-        
-        return cls(titular, banco, numero_conta, saldo, senha)
     
     def Info(self):
         print(f"Titular: {self.titular.nome}")
@@ -139,6 +122,24 @@ class Conta_Corrente(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, taxa):
         super().__init__(titular, banco, numero, saldo, senha)
         self.taxa = taxa
+    
+    #TODO Desenvolvimento | alterar os dados de entrada
+    @classmethod
+    def Construtor_Conta_Bancaria_Teclado(cls):
+        print("Digite o nome do Titular")
+        nome_titular = Entrada_De_Dado("")
+        print("Digite o número do Banco")
+        numero_banco = Entrada_De_Dado(0)
+        print("Digite o número da Conta")
+        numero_conta = Entrada_De_Dado(0)
+        print("Digite o saldo da Conta")
+        saldo = Entrada_De_Dado(0.00)
+        print("Digite a senha da Conta")
+        senha = Entrada_De_Dado("")
+        
+        #TODO Criar verificações / extrair o titular e o banco
+        
+        return cls(titular, banco, numero_conta, saldo, senha)
     
     def Info_Conta(self):
         print("-"*15)
@@ -178,6 +179,26 @@ class Conta_Poupança(Conta_Bancaria):
             print("-"*30)
             print("Não foi possível efetuar este saque.")
             print("Não há mais saques disponíveis.")
+
+# Classe para gerenciamento de dados em geral
+class Sistema:
+    def __init__(self):
+        self.bancos = []
+        self.pessoas = []
+        self.contas_correntes = []
+        self.contas_poupancas = []
+    
+    def Adicionar_Banco(self, novo_banco: Banco):
+        self.bancos.append(novo_banco)
+    
+    def Adicionar_Pessoa(self, nova_pessoa: Pessoa):
+        self.pessoas.append(nova_pessoa)
+    
+    def Adicionar_Conta_Corrente(self, nova_conta: Conta_Corrente):
+        self.contas_correntes.append(nova_conta)
+    
+    def Adicionar_Conta_Poupanca(self, nova_conta: Conta_Poupança):
+        self.contas_poupancas.append(nova_conta)
 
 #* Funções
 
@@ -378,8 +399,8 @@ def Continuar():
 #* Interface
 
 if __name__ == '__main__':
-    #TODO Criar uma lista que irá conter todas as informações do sistema
-    #? Ou uma Classe?
+    # objeto para o armazenamento e gerenciamento dos dados
+    sistema = Sistema()
     
     running = True
 
