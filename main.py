@@ -122,8 +122,7 @@ class Conta_Corrente(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, taxa):
         super().__init__(titular, banco, numero, saldo, senha)
         self.taxa = taxa
-    
-    #TODO Desenvolvimento | alterar os dados de entrada
+
     @classmethod
     def Construtor_Conta_Corrente_Teclado(cls, sistema):
         print("Digite o nome do Titular")
@@ -182,6 +181,49 @@ class Conta_Poupança(Conta_Bancaria):
         super().__init__(titular, banco, numero, saldo, senha)
         self.rendimento = rendimento
         self.total_saques = total_saques
+    
+    @classmethod
+    def Construtor_Conta_Poupança_Teclado(cls, sistema):
+        print("Digite o nome do Titular")
+        nome_titular = Entrada_De_Dado("")
+        print("Digite o número do Banco")
+        numero_banco = Entrada_De_Dado(0)
+        print("Digite o número da Conta")
+        numero_conta = Entrada_De_Dado(0)
+        print("Digite o saldo da Conta")
+        saldo = Entrada_De_Dado(0.00)
+        print("Digite o rendimento da Conta")
+        rendimento = Entrada_De_Dado(0.00)
+        total_saques = 3
+        
+        try:
+            for pessoa in sistema.pessoas:
+                if pessoa.nome == nome_titular:
+                    titular = pessoa
+                    titular_ok = True
+        except Exception as error:
+            print("-"*30)
+            print("Não foi possível encontrar o titular.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+        
+        try:
+            for banco in sistema.bancos:
+                if banco.numero == numero_banco:
+                    banco = banco
+                    banco_ok = True
+        except Exception as error:
+            print("-"*30)
+            print("Não foi possível encontrar o banco.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+        
+        if titular_ok and banco_ok:
+            return cls(titular, banco, numero_conta, saldo, rendimento, total_saques)
+        else:
+            print("-"*30)
+            print("Não foi possível continuar com o cadastro, faltaram valores.")
+            Continuar()
     
     def Info_Conta(self):
         print("-"*15)
@@ -531,6 +573,22 @@ def Continuar():
     print("-"*30)
     input("Continuar...")
     print()
+
+# Função de teste | Será removida
+def test(sistema):
+    print("-"*30)
+    print("Pessoas: ")
+    for pessoa in sistema.pessoas:
+        print(pessoa.nome)
+    
+    for banco in sistema.bancos:
+        print(banco.nome)
+    
+    for conta_corrente in sistema.contas_correntes:
+        print(conta_corrente.numero)
+    
+    for conta_poupanca in sistema.contas_poupancas:
+        print(conta_poupanca.numero)
 
 #* Interface
 
