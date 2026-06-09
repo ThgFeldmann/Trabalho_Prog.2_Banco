@@ -1,7 +1,9 @@
 # Proposta de organizaçao do arquivo .csv
 # 'Pessoa,{pessoa}'
 # 'Banco,{banco}'
-# 'Conta,{conta}'
+# 'Conta Corrente,{conta}'
+# 'Conta Poupança,{conta}'
+#TODO Criar funções para informações dos objetos
 
 #* Classes
 
@@ -304,6 +306,8 @@ class Sistema:
         self.contas_correntes = []
         self.contas_poupancas = []
     
+    # Métodos de adição de dados
+    
     def Adicionar_Banco(self, novo_banco: Banco):
         self.bancos.append(novo_banco)
     
@@ -315,6 +319,28 @@ class Sistema:
     
     def Adicionar_Conta_Poupanca(self, nova_conta: Conta_Poupança):
         self.contas_poupancas.append(nova_conta)
+    
+    # Métodos de busca de dados
+    
+    def Busca_Banco_Por_Nome(self, nome_inserido):
+        for banco in self.bancos:
+            if banco.nome == nome_inserido:
+                banco.Info_Banco()
+    
+    def Busca_Pessoa_Por_Nome(self, nome_inserido):
+        for pessoa in self.pessoas:
+            if pessoa.nome == nome_inserido:
+                pessoa.Info_Pessoa()
+                
+    def Busca_Conta_Corrente_Por_Numero(self, numero_inserido):
+        for conta_corrente in self.contas_correntes:
+            if conta_corrente.numero == numero_inserido:
+                conta_corrente.Info_Conta()
+    
+    def Busca_Conta_Poupanca_Por_Numero(self, numero_inserido):
+        for conta_poupanca in self.contas_poupancas:
+            if conta_poupanca.numero == numero_inserido:
+                conta_poupanca.Info_Conta()
 
 #* Funções
 
