@@ -1,17 +1,15 @@
-# Proposta de organizaçao do arquivo
-# 'Pessoa: {pessoa}'
-# 'Banco: {banco}'
-# 'Conta: {conta}'
-#TODO Futuramente, adicionar encapsulamento
-#TODO Métodos construtores com input
+# Proposta de organizaçao do arquivo .csv
+# 'Pessoa,{pessoa}'
+# 'Banco,{banco}'
+# 'Conta,{conta}'
 
 #* Classes
 
 class Banco:
     def __init__(self, nome, cnpj, numero):
-        self.nome = nome
-        self.cnpj = cnpj
-        self.numero = numero
+        self._nome = nome
+        self._cnpj = cnpj
+        self._numero = numero
         
         # Lista de contas bancárias
         self.contas = []
@@ -52,8 +50,8 @@ class Pessoa:
     def __init__(self, nome, sobrenome, idade, cpf):
         self.nome = nome
         self.sobrenome = sobrenome
-        self.idade = idade
-        self.cpf = cpf
+        self._idade = idade
+        self._cpf = cpf
         
         # Lista de contas bancárias
         self.contas = []
@@ -89,11 +87,62 @@ class Pessoa:
 # Classe abstrata para as contas correntes e poupanças
 class Conta_Bancaria:
     def __init__(self, titular: Pessoa, banco: Banco, numero, saldo, senha):
-        self.titular = Pessoa(titular)
-        self.banco = Banco(banco)
-        self.numero = numero
-        self.saldo = saldo
-        self.senha = senha
+        self.__titular = Pessoa(titular)
+        self.__banco = Banco(banco)
+        self.__numero = numero
+        self.__saldo = saldo
+        self.__senha = senha
+    
+    # Getters
+
+    @property
+    def titular(self):
+        return self.__titular
+    
+    @property
+    def banco(self):
+        return self.__banco
+    
+    @property
+    def numero(self):
+        return self.__numero
+    
+    @property
+    def saldo(self):
+        return self.__saldo
+    
+    @property
+    def senha(self):
+        return self.__senha
+    
+    # Setters
+    
+    @titular.setter
+    def titular(self, other):
+        if other:
+            self.titular = other
+    
+    @banco.setter
+    def banco(self, other):
+        if other:
+            self.banco = other
+    
+    @numero.setter
+    def numero(self, other):
+        if other:
+            self.numero = other
+    
+    @saldo.setter
+    def saldo(self, other):
+        if other:
+            self.saldo = other
+    
+    @senha.setter
+    def senha(self, other):
+        if other:
+            self.senha = other
+    
+    # Métodos
     
     def Info(self):
         print(f"Titular: {self.titular.nome}")
@@ -121,7 +170,7 @@ class Conta_Bancaria:
 class Conta_Corrente(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, taxa):
         super().__init__(titular, banco, numero, saldo, senha)
-        self.taxa = taxa
+        self._taxa = taxa
 
     @classmethod
     def Construtor_Conta_Corrente_Teclado(cls, sistema):
@@ -179,8 +228,8 @@ class Conta_Corrente(Conta_Bancaria):
 class Conta_Poupança(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, rendimento, total_saques=3):
         super().__init__(titular, banco, numero, saldo, senha)
-        self.rendimento = rendimento
-        self.total_saques = total_saques
+        self._rendimento = rendimento
+        self._total_saques = total_saques
     
     @classmethod
     def Construtor_Conta_Poupança_Teclado(cls, sistema):
@@ -247,7 +296,7 @@ class Conta_Poupança(Conta_Bancaria):
             print("Não foi possível efetuar este saque.")
             print("Não há mais saques disponíveis.")
 
-# Classe para gerenciamento de dados em geral
+# Classe para armazenamento e gerenciamento de dados em geral
 class Sistema:
     def __init__(self):
         self.bancos = []
