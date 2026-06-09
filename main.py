@@ -125,7 +125,7 @@ class Conta_Corrente(Conta_Bancaria):
     
     #TODO Desenvolvimento | alterar os dados de entrada
     @classmethod
-    def Construtor_Conta_Bancaria_Teclado(cls):
+    def Construtor_Conta_Corrente_Teclado(cls, sistema):
         print("Digite o nome do Titular")
         nome_titular = Entrada_De_Dado("")
         print("Digite o número do Banco")
@@ -137,9 +137,34 @@ class Conta_Corrente(Conta_Bancaria):
         print("Digite a senha da Conta")
         senha = Entrada_De_Dado("")
         
-        #TODO Criar verificações / extrair o titular e o banco
+        try:
+            for pessoa in sistema.pessoas:
+                if pessoa.nome == nome_titular:
+                    titular = pessoa
+                    titular_ok = True
+        except Exception as error:
+            print("-"*30)
+            print("Não foi possível encontrar o titular.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
         
-        return cls(titular, banco, numero_conta, saldo, senha)
+        try:
+            for banco in sistema.bancos:
+                if banco.numero == numero_banco:
+                    banco = banco
+                    banco_ok = True
+        except Exception as error:
+            print("-"*30)
+            print("Não foi possível encontrar o banco.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+        
+        if titular_ok and banco_ok:
+            return cls(titular, banco, numero_conta, saldo, senha)
+        else:
+            print("-"*30)
+            print("Não foi possível continuar com o cadastro, faltaram valores.")
+            Continuar()
     
     def Info_Conta(self):
         print("-"*15)
@@ -286,8 +311,88 @@ def Entrada_De_Dado(tipo):
         else:
             running = False
 
+def Cadastro_Conta(sistema):
+    if len(sistema.pessoas) <= 0:
+        print("-"*30)
+        print("Não existem pessoas salvas no sistema.")
+        print("Saindo...")
+        Continuar()
+        return False
+    elif len(sistema.bancos) <= 0:
+        print("-"*30)
+        print("Não existem bancos salvos no sistema.")
+        print("Saindo...")
+        Continuar()
+        return False
+    else:
+    
+        running = True
+
+        while running:
+            print("Qual tipo deseja cadastrar?")
+            print("1 - Corrente")
+            print("2 - Poupança")
+            print("0 - Sair")
+            
+            try:
+                escolha = int(input(": "))
+                
+                if escolha < 0:
+                    raise ValueError
+                elif escolha == 1:
+                    print("-"*30)
+                    conta = Conta_Corrente.Construtor_Conta_Corrente_Teclado(sistema)
+                    
+                    try:
+                        sistema.Adicionar_Conta_Corrente(conta)
+                        running = False
+                        return True
+                    except Exception as error:
+                        print("-"*30)
+                        print("Ocorreu um erro inesperado durante o cadastro, tente novamente.")
+                        Continuar()
+                        continue
+                    
+                elif escolha == 2:
+                    print("-"*30)
+                    print("-"*30)
+                    conta = Conta_Poupança.Construtor_Conta_Poupança_Teclado(sistema)
+                    
+                    try:
+                        sistema.Adicionar_Conta_Poupança(conta)
+                        running = False
+                        return True
+                    except Exception as error:
+                        print("-"*30)
+                        print("Ocorreu um erro inesperado durante o cadastro, tente novamente.")
+                        Continuar()
+                        continue
+
+                elif escolha == 0:
+                    print("-"*30)
+                    print("Encerrando a execução...")
+                    Continuar()
+                    running = False
+                    return False
+                else:
+                    print("-"*30)
+                    print("Opção inválida, tente novamente.")
+                    Continuar()
+
+            except ValueError:
+                print("-"*30)
+                print("A entrada deve conter apenas números positivos")
+                Continuar()
+                continue
+            except Exception as error:
+                print("-"*30)
+                print("Ocorreu um erro inesperado, tente novamente.")
+                print(f"Mensagem de erro: {error}")
+                Continuar()
+                continue
+
 # Função para o menu de cadastros
-def Menu_Cadastro():
+def Menu_Cadastro(sistema):
     running = True
 
     while running:
@@ -307,16 +412,47 @@ def Menu_Cadastro():
             elif escolha == 1:
                 print("-"*30)
                 banco = Banco.Construtor_Banco_Teclado()
-                #Cadastro_Banco()
-                running = False
+
+                try:
+                    sistema.Adicionar_Banco(banco)
+                    print("Banco cadastrado com sucesso.")
+                    Continuar()
+                    running = False
+                except Exception as error:
+                    print("-"*30)
+                    print("Ocorreu um erro inesperado, tente novamente.")
+                    print(f"Mensagem de erro: {error}")
+                    Continuar()
+                    continue
             elif escolha == 2:
                 print("-"*30)
-                #Cadastro_Pessoa()
-                running = False
+                pessoa = Pessoa.Construtor_Pessoa_Teclado()
+
+                try:
+                    sistema.Adicionar_Pessoa(pessoa)
+                    print("Pessoa cadastrada com sucesso.")
+                    Continuar()
+                    running = False
+                except Exception as error:
+                    print("-"*30)
+                    print("Ocorreu um erro inesperado, tente novamente.")
+                    print(f"Mensagem de erro: {error}")
+                    Continuar()
+                    continue
             elif escolha == 3:
                 print("-"*30)
-                #Cadastro_Conta()
-                running = False
+                sucesso = Cadastro_Conta(sistema)
+                if sucesso:
+                    print("-"*30)
+                    print("Conta cadastrada com sucesso.")
+                    Continuar()
+                    running = False
+                else:
+                    print("-"*30)
+                    print("O cadastro foi cancelado.")
+                    Continuar()
+                    running = False
+
             elif escolha == 0:
                 print("-"*30)
                 print("Encerrando a execução...")
@@ -340,7 +476,7 @@ def Menu_Cadastro():
             continue
 
 # Função para o menu de informações
-def Menu_Info():
+def Menu_Info(sistema):
     running = True
 
     while running:
@@ -422,9 +558,9 @@ if __name__ == '__main__':
             if escolha < 0:
                 raise ValueError
             elif escolha == 1:
-                Menu_Cadastro()
+                Menu_Cadastro(sistema)
             elif escolha == 2:
-                Menu_Info()
+                Menu_Info(sistema)
             elif escolha == 0:
                 print("-"*30)
                 print("Encerrando a execução...")
