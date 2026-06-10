@@ -30,9 +30,9 @@ class Banco:
     def Info_Banco(self):
         print("-"*15)
         print("Banco")
-        print(f"Nome: {self.nome}")
-        print(f"CNPJ: {self.cnpj}")
-        print(f"Número: {self.numero}")
+        print(f"Nome: {self._nome}")
+        print(f"CNPJ: {self._cnpj}")
+        print(f"Número: {self._numero}")
     
     def Info_Contas(self):
         print("-"*30)
@@ -68,16 +68,22 @@ class Pessoa:
         idade = Entrada_De_Dado(0)
         print("Digite o CPF da Pessoa")
         cpf = Entrada_De_Dado("")
-
-        return cls(nome, sobrenome, idade, cpf)
+        
+        if cpf.isdigit:
+            return cls(nome, sobrenome, idade, cpf)
+        else:
+            print("-"*30)
+            print("CPF não pode conter letras, tente novamente.")
+            print("Por segurança, este cadastro foi cancelado.")
+            Continuar()
     
     def Info_Pessoa(self):
         print("-"*30)
         print("Pessoa")
         print(f"Nome: {self.nome}")
         print(f"Sobrenome: {self.sobrenome}")
-        print(f"Idade: {self.idade}")
-        print(f"CPF: {self.cpf}")
+        print(f"Idade: {self._idade}")
+        print(f"CPF: {self._cpf}")
     
     def Info_Contas(self):
         for conta in self.contas:
@@ -174,12 +180,72 @@ class Conta_Corrente(Conta_Bancaria):
         super().__init__(titular, banco, numero, saldo, senha)
         self._taxa = taxa
 
+    #TODO Testando
     @classmethod
     def Construtor_Conta_Corrente_Teclado(cls, sistema):
-        print("Digite o nome do Titular")
-        nome_titular = Entrada_De_Dado("")
-        print("Digite o número do Banco")
-        numero_banco = Entrada_De_Dado(0)
+        # print("Digite o nome do Titular")
+        # nome_titular = Entrada_De_Dado("")
+        # print("Digite o número do Banco")
+        # numero_banco = Entrada_De_Dado(0)
+        # print("Digite o número da Conta")
+        # numero_conta = Entrada_De_Dado(0)
+        # print("Digite o saldo da Conta")
+        # saldo = Entrada_De_Dado(0.00)
+        # print("Digite a senha da Conta")
+        # senha = Entrada_De_Dado("")
+        
+        # Flags para quando um valor correto for encontrado
+        titular_ok = False
+        banco_ok = False
+        
+        recebendo_valores = True
+
+        while recebendo_valores:
+            print("Digite o nome do Titular")
+            nome_titular = Entrada_De_Dado("")
+            try:
+                for pessoa in sistema.pessoas:
+                    if pessoa.nome == nome_titular:
+                        titular = pessoa
+                        titular_ok = True
+                        recebendo_valores = True
+                
+                if not titular_ok:
+                    print("-"*30)
+                    print("Não foi encontrada nenhuma pessoa com este nome.")
+                    print("Tente novamente.")
+                    Continuar()
+                    continue
+            except Exception as error:
+                print("-"*30)
+                print("Não foi possível encontrar o titular.")
+                print(f"Mensagem de erro: {error}")
+                Continuar()
+        
+        recebendo_valores = True
+        
+        while recebendo_valores:
+            print("Digite o número do Banco")
+            numero_banco = Entrada_De_Dado(0)
+            try:
+                for banco in sistema.bancos:
+                    if banco._numero == numero_banco:
+                        banco_encontrado = banco
+                        banco_ok = True
+                        recebendo_valores = False
+                
+                if not banco_ok:
+                    print("-"*30)
+                    print("Não foi encontrado nenhum banco com esse número.")
+                    print("Tente novamente.")
+                    Continuar()
+                    continue
+            except Exception as error:
+                print("-"*30)
+                print("Não foi possível encontrar o banco.")
+                print(f"Mensagem de erro: {error}")
+                Continuar()
+        
         print("Digite o número da Conta")
         numero_conta = Entrada_De_Dado(0)
         print("Digite o saldo da Conta")
@@ -187,30 +253,9 @@ class Conta_Corrente(Conta_Bancaria):
         print("Digite a senha da Conta")
         senha = Entrada_De_Dado("")
         
-        try:
-            for pessoa in sistema.pessoas:
-                if pessoa.nome == nome_titular:
-                    titular = pessoa
-                    titular_ok = True
-        except Exception as error:
-            print("-"*30)
-            print("Não foi possível encontrar o titular.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
-        
-        try:
-            for banco in sistema.bancos:
-                if banco.numero == numero_banco:
-                    banco = banco
-                    banco_ok = True
-        except Exception as error:
-            print("-"*30)
-            print("Não foi possível encontrar o banco.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
-        
         if titular_ok and banco_ok:
-            return cls(titular, banco, numero_conta, saldo, senha)
+            print("Cadastrando a conta...")
+            return cls(titular, banco_encontrado, numero_conta, saldo, senha)
         else:
             print("-"*30)
             print("Não foi possível continuar com o cadastro, faltaram valores.")
@@ -324,23 +369,23 @@ class Sistema:
     
     def Busca_Banco_Por_Nome(self, nome_inserido):
         for banco in self.bancos:
-            if banco.nome == nome_inserido:
-                banco.Info_Banco()
+            if banco._nome == nome_inserido:
+                return banco
     
     def Busca_Pessoa_Por_Nome(self, nome_inserido):
         for pessoa in self.pessoas:
             if pessoa.nome == nome_inserido:
-                pessoa.Info_Pessoa()
+                return pessoa
                 
     def Busca_Conta_Corrente_Por_Numero(self, numero_inserido):
         for conta_corrente in self.contas_correntes:
             if conta_corrente.numero == numero_inserido:
-                conta_corrente.Info_Conta()
+                return conta_corrente
     
     def Busca_Conta_Poupanca_Por_Numero(self, numero_inserido):
         for conta_poupanca in self.contas_poupancas:
             if conta_poupanca.numero == numero_inserido:
-                conta_poupanca.Info_Conta()
+                return conta_poupanca
 
 #* Funções
 
@@ -608,26 +653,98 @@ def Menu_Info(sistema):
         try:
             escolha = int(input("\n: "))
             
-            if escolha < 0:
+            if escolha < 0: # Entrada inválida
                 raise ValueError
-            elif escolha == 1:
+            elif escolha == 1: # Banco
                 print("-"*30)
-                Info_Banco()
-                running = False
-            elif escolha == 2:
+                try:
+                    print("Digite o nome do banco")
+                    nome_banco = Entrada_De_Dado("")
+                    banco = sistema.Busca_Banco_Por_Nome(nome_banco)
+                    
+                    if not banco:
+                        print("-"*30)
+                        print("Este banco não existe no sistema.")
+                        print("Cancelando a busca...")
+                        Continuar()
+                    else: 
+                        banco.Info_Banco()
+                        quantidade_contas = len(banco.contas)
+                        
+                        if quantidade_contas <= 0:
+                            print("Este banco não possui contas cadastradas.")
+                        elif quantidade_contas == 1:
+                            print(f"Este banco possui: {quantidade_contas} conta")
+                        else:
+                            print(f"Este banco possui: {quantidade_contas} contas.")
+
+                        Continuar()
+                        running = False
+                except Exception as error:
+                    print("-"*30)
+                    print("Ocorreu um erro inesperado, tente novamente.")
+                    print(f"Mensagem de erro: {error}")
+                    Continuar()
+                    continue
+            elif escolha == 2: # Pessoa
                 print("-"*30)
-                Info_Pessoa()
-                running = False
-            elif escolha == 3:
+                try:
+                    print("Digite o nome da pessoa")
+                    nome_pessoa = Entrada_De_Dado("")
+                    pessoa = sistema.Busca_Pessoa_Por_Nome(nome_pessoa)
+                    
+                    if not pessoa:
+                        print("-"*30)
+                        print("Esta pessoa não existe no sistema.")
+                        print("Cancelando a busca...")
+                        Continuar()
+                    else: 
+                        pessoa.Info_Pessoa()
+                        quantidade_contas = len(pessoa.contas)
+                        
+                        if quantidade_contas <= 0:
+                            print("Esta pessoa não possui contas cadastradas.")
+                        elif quantidade_contas == 1:
+                            print(f"Esta pessoa possui: {quantidade_contas} conta")
+                        else:
+                            print(f"Esta pessoa possui: {quantidade_contas} contas.")
+
+                        Continuar()
+                        running = False
+                except Exception as error:
+                    print("-"*30)
+                    print("Ocorreu um erro inesperado, tente novamente.")
+                    print(f"Mensagem de erro: {error}")
+                    Continuar()
+                    continue
+            elif escolha == 3: # Conta
                 print("-"*30)
-                Info_Conta()
-                running = False
-            elif escolha == 0:
+                try:
+                    print("Digite o número da conta")
+                    numero_conta = Entrada_De_Dado(0)
+                    conta = sistema.Busca_Conta_Por_Numero(numero_conta)
+                    
+                    if not conta:
+                        print("-"*30)
+                        print("Esta conta não existe no sistema.")
+                        print("Cancelando a busca...")
+                        Continuar()
+                    else: 
+                        conta.Info_Conta()
+                        Continuar()
+                        running = False
+                except Exception as error:
+                    print("-"*30)
+                    print("Ocorreu um erro inesperado, tente novamente.")
+                    print(f"Mensagem de erro: {error}")
+                    Continuar()
+                    continue
+            elif escolha == 0: # Sair
                 print("-"*30)
                 print("Encerrando a execução...")
                 Continuar()
                 running = False
-            else:
+            else: # Opção inválida
                 print("-"*30)
                 print("Opção inválida, tente novamente.")
                 Continuar()
@@ -651,19 +768,10 @@ def Continuar():
 
 # Função de teste | Será removida
 def test(sistema):
-    print("-"*30)
-    print("Pessoas: ")
-    for pessoa in sistema.pessoas:
-        print(pessoa.nome)
-    
-    for banco in sistema.bancos:
-        print(banco.nome)
-    
-    for conta_corrente in sistema.contas_correntes:
-        print(conta_corrente.numero)
-    
-    for conta_poupanca in sistema.contas_poupancas:
-        print(conta_poupanca.numero)
+    banco = Banco("banco", "123456", "123")
+    pessoa = Pessoa("fulano", "Fulano", 23, "0123456")
+    sistema.Adicionar_Banco(banco)
+    sistema.Adicionar_Pessoa(pessoa)
 
 #* Interface
 
@@ -688,7 +796,11 @@ if __name__ == '__main__':
         try:
             escolha = int(input("\n: "))
             
-            if escolha < 0:
+            if escolha == 10: # Função de teste
+                test(sistema)
+                Continuar()
+            
+            elif escolha < 0:
                 raise ValueError
             elif escolha == 1:
                 Menu_Cadastro(sistema)
