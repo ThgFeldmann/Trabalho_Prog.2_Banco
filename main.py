@@ -248,8 +248,17 @@ class Conta_Corrente(Conta_Bancaria):
         taxa = Entrada_De_Dado(0.00)
         
         if titular_ok and banco_ok:
-            print("Cadastrando a conta...")
-            return cls(titular, banco_encontrado, numero_conta, saldo, senha, taxa)
+            
+            conta_existe = sistema.Verificar_Conta_Corrente_Existe(numero_conta)
+            
+            if not conta_existe:
+                print("Cadastrando a conta...")
+                return cls(titular, banco_encontrado, numero_conta, saldo, senha, taxa)
+            else:
+                print("-"*30)
+                print("Não foi possível continuar com o cadastro.")
+                print("Esta conta já existe no sistema.")
+                Continuar()
         else:
             print("-"*30)
             print("Não foi possível continuar com o cadastro, faltaram valores.")
@@ -337,8 +346,17 @@ class Conta_Poupanca(Conta_Bancaria):
         rendimento = Entrada_De_Dado(0.00)
         
         if titular_ok and banco_ok:
-            print("Cadastrando a conta...")
-            return cls(titular, banco_encontrado, numero_conta, saldo, senha, rendimento)
+            
+            conta_existe = sistema.Verificar_Conta_Poupanca_Existe(numero_conta)
+            
+            if not conta_existe:
+                print("Cadastrando a conta...")
+                return cls(titular, banco_encontrado, numero_conta, saldo, senha, rendimento)
+            else:
+                print("-"*30)
+                print("Não foi possível continuar com o cadastro.")
+                print("Esta conta já existe no sistema.")
+        
         else:
             print("-"*30)
             print("Não foi possível continuar com o cadastro, faltaram valores.")
@@ -410,7 +428,19 @@ class Sistema:
             if conta_poupanca.numero == numero_inserido:
                 return conta_poupanca
 
-    # def Verificar_Conta_Existe(self, numero_inserido):
+    # Método para verificar se uma conta corrente já existe no sistema
+    # retorna um 'booleano'
+    def Verificar_Conta_Corrente_Existe(self, numero_inserido):
+        for conta in self.contas_correntes:
+            if conta.numero == numero_inserido:
+                return True
+    
+    # Método para verificar se uma conta poupança já existe no sistema
+    # retorna um 'booleano'
+    def Verificar_Conta_Poupanca_Existe(self, numero_inserido):
+        for conta in self.contas_poupancas:
+            if conta.numero == numero_inserido:
+                return True
 
 #* Funções
 
@@ -803,8 +833,8 @@ def test(sistema):
     sistema.Adicionar_Conta_Corrente(conta_corrente)
     sistema.Adicionar_Conta_Poupanca(conta_poupanca)
     
-    conta_corrente.Info_Conta()
-    conta_poupanca.Info_Conta()
+    # conta_corrente.Info_Conta()
+    # conta_poupanca.Info_Conta()
 
 #* Interface
 
@@ -839,6 +869,9 @@ if __name__ == '__main__':
                 Menu_Cadastro(sistema)
             elif escolha == 2:
                 Menu_Info(sistema)
+            elif escolha == 3:
+                Saque()
+            
             elif escolha == 0:
                 print("-"*30)
                 print("Encerrando a execução...")
