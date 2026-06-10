@@ -3,7 +3,7 @@
 # 'Banco,{banco}'
 # 'Conta Corrente,{conta}'
 # 'Conta Poupança,{conta}'
-#TODO Criar funções para informações dos objetos
+#TODO Criar funções para saques e depósitos
 
 #* Classes
 
@@ -606,6 +606,58 @@ def Cadastro_Conta(sistema):
                 print(f"Mensagem de erro: {error}")
                 Continuar()
                 continue
+
+def Saque(sistema, tipo_conta):
+    running = True
+
+    while running:
+        print("Informe o número da conta")
+        numero_conta = Entrada_De_Dado(0)
+        
+        conta_existe = sistema.Verificar_Conta_Poupanca_Existe(numero_conta)
+        
+        if conta_existe:
+            conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
+            
+            valor = Entrada_De_Dado(0.00)
+            
+            if valor <= 0:
+                print("-"*30)
+                print("O valor do saque deve ser positivo.")
+                Continuar()
+                continue
+
+def Escolher_Saque(sistema): #TODO Em desenvolvimento
+    running = True
+
+    while running:
+        print("Informe o tipo da conta:")
+        print("1 - Corrente")
+        print("2 - Poupança")
+        print("0 - Sair")
+        
+        try:
+            escolha = int(input("\n: "))
+            
+            if escolha == 0:
+                print("-"*30)
+                print("Saindo...")
+                Continuar()
+                running = False
+            elif escolha == 1:
+                Saque(sistema, "corrente")
+            
+        except ValueError:
+            print("-"*30)
+            print("A entrada deve conter apenas números positivos")
+            Continuar()
+            continue
+        except Exception as error:
+            print("-"*30)
+            print("Ocorreu um erro inesperado, tente novamente.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+            continue
 
 # Função para o menu de cadastros
 def Menu_Cadastro(sistema):
