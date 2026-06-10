@@ -25,6 +25,8 @@ class Banco:
         print("Digite o número do Banco")
         numero = Entrada_De_Dado(0)
         
+        nome = nome.title()
+        
         return cls(nome, cnpj, numero)
     
     def Info_Banco(self):
@@ -70,6 +72,8 @@ class Pessoa:
         cpf = Entrada_De_Dado("")
         
         if cpf.isdigit:
+            nome = nome.title()
+            sobrenome = sobrenome.title
             return cls(nome, sobrenome, idade, cpf)
         else:
             print("-"*30)
@@ -95,12 +99,12 @@ class Pessoa:
 # Classe abstrata para as contas correntes e poupanças
 class Conta_Bancaria:
     def __init__(self, titular: Pessoa, banco: Banco, numero, saldo, senha):
-        self.__titular = Pessoa(titular)
-        self.__banco = Banco(banco)
+        self.__titular = titular
+        self.__banco = banco
         self.__numero = numero
         self.__saldo = saldo
         self.__senha = senha
-    
+
     # Getters
 
     @property
@@ -154,9 +158,9 @@ class Conta_Bancaria:
     
     def Info(self):
         print(f"Titular: {self.titular.nome}")
-        print(f"Banco: {self.numero_banco.nome}")
+        print(f"Banco: {self.banco._numero}")
         print(f"Número: {self.numero}")
-        print(f"Saldo: {self.saldo:.2f}")
+        print(f"Saldo: R$ {self.saldo:.2f}")
         print(f"Senha: {self.senha}")
     
     def Saque(self, other: float):
@@ -180,20 +184,8 @@ class Conta_Corrente(Conta_Bancaria):
         super().__init__(titular, banco, numero, saldo, senha)
         self._taxa = taxa
 
-    #TODO Testando
     @classmethod
     def Construtor_Conta_Corrente_Teclado(cls, sistema):
-        # print("Digite o nome do Titular")
-        # nome_titular = Entrada_De_Dado("")
-        # print("Digite o número do Banco")
-        # numero_banco = Entrada_De_Dado(0)
-        # print("Digite o número da Conta")
-        # numero_conta = Entrada_De_Dado(0)
-        # print("Digite o saldo da Conta")
-        # saldo = Entrada_De_Dado(0.00)
-        # print("Digite a senha da Conta")
-        # senha = Entrada_De_Dado("")
-        
         # Flags para quando um valor correto for encontrado
         titular_ok = False
         banco_ok = False
@@ -208,7 +200,7 @@ class Conta_Corrente(Conta_Bancaria):
                     if pessoa.nome == nome_titular:
                         titular = pessoa
                         titular_ok = True
-                        recebendo_valores = True
+                        recebendo_valores = False
                 
                 if not titular_ok:
                     print("-"*30)
@@ -252,10 +244,12 @@ class Conta_Corrente(Conta_Bancaria):
         saldo = Entrada_De_Dado(0.00)
         print("Digite a senha da Conta")
         senha = Entrada_De_Dado("")
+        print("Digite a taxa mensal da Conta")
+        taxa = Entrada_De_Dado(0.00)
         
         if titular_ok and banco_ok:
             print("Cadastrando a conta...")
-            return cls(titular, banco_encontrado, numero_conta, saldo, senha)
+            return cls(titular, banco_encontrado, numero_conta, saldo, senha, taxa)
         else:
             print("-"*30)
             print("Não foi possível continuar com o cadastro, faltaram valores.")
@@ -265,57 +259,86 @@ class Conta_Corrente(Conta_Bancaria):
         print("-"*15)
         print("Conta Corrente")
         super().Info()
-        print(f"Taxa Mensal: R$ {self.taxa:.2f}")
+        print(f"Taxa Mensal: R$ {self._taxa:.2f}")
     
     def Novo_Mes(self):
         self.saldo -= self.taxa
-        print(f"Taxa Mensal: R$ {self.taxa:.2f}")
+        print(f"Taxa Mensal: R$ {self._taxa:.2f}")
         print(f"Saldo: R$ {self.saldo:.2f}")
 
-class Conta_Poupança(Conta_Bancaria):
+class Conta_Poupanca(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, rendimento, total_saques=3):
         super().__init__(titular, banco, numero, saldo, senha)
         self._rendimento = rendimento
         self._total_saques = total_saques
     
+    #TODO Corrigir | assimilar à de conta_corrente
     @classmethod
-    def Construtor_Conta_Poupança_Teclado(cls, sistema):
-        print("Digite o nome do Titular")
-        nome_titular = Entrada_De_Dado("")
-        print("Digite o número do Banco")
-        numero_banco = Entrada_De_Dado(0)
+    def Construtor_Conta_Poupanca_Teclado(cls, sistema):
+        # Flags para quando um valor correto for encontrado
+        titular_ok = False
+        banco_ok = False
+        
+        recebendo_valores = True
+
+        while recebendo_valores:
+            print("Digite o nome do Titular")
+            nome_titular = Entrada_De_Dado("")
+            try:
+                for pessoa in sistema.pessoas:
+                    if pessoa.nome == nome_titular:
+                        titular = pessoa
+                        titular_ok = True
+                        recebendo_valores = False
+                
+                if not titular_ok:
+                    print("-"*30)
+                    print("Não foi encontrada nenhuma pessoa com este nome.")
+                    print("Tente novamente.")
+                    Continuar()
+                    continue
+            except Exception as error:
+                print("-"*30)
+                print("Não foi possível encontrar o titular.")
+                print(f"Mensagem de erro: {error}")
+                Continuar()
+        
+        recebendo_valores = True
+        
+        while recebendo_valores:
+            print("Digite o número do Banco")
+            numero_banco = Entrada_De_Dado(0)
+            try:
+                for banco in sistema.bancos:
+                    if banco._numero == numero_banco:
+                        banco_encontrado = banco
+                        banco_ok = True
+                        recebendo_valores = False
+                
+                if not banco_ok:
+                    print("-"*30)
+                    print("Não foi encontrado nenhum banco com esse número.")
+                    print("Tente novamente.")
+                    Continuar()
+                    continue
+            except Exception as error:
+                print("-"*30)
+                print("Não foi possível encontrar o banco.")
+                print(f"Mensagem de erro: {error}")
+                Continuar()
+        
         print("Digite o número da Conta")
         numero_conta = Entrada_De_Dado(0)
         print("Digite o saldo da Conta")
         saldo = Entrada_De_Dado(0.00)
+        print("Digite a senha da Conta")
+        senha = Entrada_De_Dado("")
         print("Digite o rendimento da Conta")
         rendimento = Entrada_De_Dado(0.00)
-        total_saques = 3
-        
-        try:
-            for pessoa in sistema.pessoas:
-                if pessoa.nome == nome_titular:
-                    titular = pessoa
-                    titular_ok = True
-        except Exception as error:
-            print("-"*30)
-            print("Não foi possível encontrar o titular.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
-        
-        try:
-            for banco in sistema.bancos:
-                if banco.numero == numero_banco:
-                    banco = banco
-                    banco_ok = True
-        except Exception as error:
-            print("-"*30)
-            print("Não foi possível encontrar o banco.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
         
         if titular_ok and banco_ok:
-            return cls(titular, banco, numero_conta, saldo, rendimento, total_saques)
+            print("Cadastrando a conta...")
+            return cls(titular, banco_encontrado, numero_conta, saldo, senha, rendimento)
         else:
             print("-"*30)
             print("Não foi possível continuar com o cadastro, faltaram valores.")
@@ -325,13 +348,13 @@ class Conta_Poupança(Conta_Bancaria):
         print("-"*15)
         print("Conta Poupança")
         super().Info()
-        print(f"Rendimento: {self.rendimento}%")
-        print(f"Total de saques: {self.total_saques}")
+        print(f"Rendimento: {self._rendimento}%")
+        print(f"Total de saques: {self._total_saques}")
     
     def Novo_Mes(self):
-        self.saldo += (self.rendimento * self.saldo)
-        print(f"Rendimento: {self.rendimento}%")
-        print(f"Saldo: R$ {self.saldo:.2f}")
+        self._saldo += (self._rendimento * self._saldo)
+        print(f"Rendimento: {self._rendimento}%")
+        print(f"Saldo: R$ {self._saldo:.2f}")
     
     def Saque(self, other):
         if self.total_saques <= 3 and self.total_saques > 0:
@@ -362,7 +385,7 @@ class Sistema:
     def Adicionar_Conta_Corrente(self, nova_conta: Conta_Corrente):
         self.contas_correntes.append(nova_conta)
     
-    def Adicionar_Conta_Poupanca(self, nova_conta: Conta_Poupança):
+    def Adicionar_Conta_Poupanca(self, nova_conta: Conta_Poupanca):
         self.contas_poupancas.append(nova_conta)
     
     # Métodos de busca de dados
@@ -386,6 +409,8 @@ class Sistema:
         for conta_poupanca in self.contas_poupancas:
             if conta_poupanca.numero == numero_inserido:
                 return conta_poupanca
+
+    # def Verificar_Conta_Existe(self, numero_inserido):
 
 #* Funções
 
@@ -423,7 +448,7 @@ def Entrada_De_Dado(tipo):
         
         elif type(tipo) == float: #* Se o tipo da entrada for de 'float'
             try:
-                entrada = float(entrada.replace(",", ".").strip())
+                entrada = float(entrada.replace(",", "."))
                 
                 if entrada <= 0:
                     print("-"*30)
@@ -487,7 +512,6 @@ def Cadastro_Conta(sistema):
         Continuar()
         return False
     else:
-    
         running = True
 
         while running:
@@ -518,10 +542,10 @@ def Cadastro_Conta(sistema):
                 elif escolha == 2:
                     print("-"*30)
                     print("-"*30)
-                    conta = Conta_Poupança.Construtor_Conta_Poupança_Teclado(sistema)
+                    conta = Conta_Poupanca.Construtor_Conta_Poupanca_Teclado(sistema)
                     
                     try:
-                        sistema.Adicionar_Conta_Poupança(conta)
+                        sistema.Adicionar_Conta_Poupanca(conta)
                         running = False
                         return True
                     except Exception as error:
@@ -718,11 +742,12 @@ def Menu_Info(sistema):
                     Continuar()
                     continue
             elif escolha == 3: # Conta
+                #TODO pedir o tipo da conta
                 print("-"*30)
                 try:
                     print("Digite o número da conta")
                     numero_conta = Entrada_De_Dado(0)
-                    conta = sistema.Busca_Conta_Por_Numero(numero_conta)
+                    conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
                     
                     if not conta:
                         print("-"*30)
@@ -768,10 +793,18 @@ def Continuar():
 
 # Função de teste | Será removida
 def test(sistema):
-    banco = Banco("banco", "123456", "123")
+    banco = Banco("banco", "123456", 123)
     pessoa = Pessoa("fulano", "Fulano", 23, "0123456")
+    conta_corrente = Conta_Corrente(pessoa, banco, 456, 700, 456, 50)
+    conta_poupanca = Conta_Poupanca(pessoa, banco, 789, 500, 789, 25)
+    
     sistema.Adicionar_Banco(banco)
     sistema.Adicionar_Pessoa(pessoa)
+    sistema.Adicionar_Conta_Corrente(conta_corrente)
+    sistema.Adicionar_Conta_Poupanca(conta_poupanca)
+    
+    conta_corrente.Info_Conta()
+    conta_poupanca.Info_Conta()
 
 #* Interface
 
@@ -790,7 +823,7 @@ if __name__ == '__main__':
         print("2 - Informações")
         print("3 - Sacar de uma conta")
         print("4 - Depositar em uma conta")
-        print("5 - Novo mês")
+        print("5 - Cobrar taxa de uma conta")
         print("0 - Sair")
 
         try:
