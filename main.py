@@ -779,6 +779,45 @@ def Verifica_Senha(sistema):
             Continuar()
             continue
 
+def Escolher_Tipo_Conta(sistema):
+    running = True
+    
+    while running:
+        print("-"*30)
+        print("Informe o tipo da conta")
+        print("1 - Corrente")
+        print("2 - Poupança")
+        
+        try:
+            print()
+            escolha = Entrada_De_Dado(0)
+            
+            if escolha <= 0:
+                raise ValueError
+            elif escolha == 1:
+                running = False
+                return "corrente"
+            elif escolha == 2:
+                running = False
+                return "poupanca"
+            else:
+                print("-"*30)
+                print("Opção inválida, tente novamente.")
+                Continuar()
+                continue
+            
+        except ValueError:
+            print("-"*30)
+            print("A entrada deve conter apenas números positivos")
+            Continuar()
+            continue
+        except Exception as error:
+            print("-"*30)
+            print("Ocorreu um erro inesperado, tente novamente.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+            continue
+
 # Função para o menu de cadastros
 def Menu_Cadastro(sistema):
     running = True
@@ -944,12 +983,17 @@ def Menu_Info(sistema):
                     Continuar()
                     continue
             elif escolha == 3: # Conta
-                #TODO pedir o tipo da conta
+                tipo = Escolher_Tipo_Conta(sistema)
+                
                 print("-"*30)
                 try:
                     print("Digite o número da conta")
                     numero_conta = Entrada_De_Dado(0)
-                    conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
+                    
+                    if tipo == "corrente":
+                        conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
+                    elif tipo == "poupanca":
+                        conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
                     
                     if not conta:
                         print("-"*30)
@@ -1003,15 +1047,15 @@ def test(sistema):
     
     sistema.Adicionar_Banco(banco)
     sistema.Adicionar_Pessoa(pessoa)
-    # sistema.Adicionar_Conta_Corrente(conta_corrente)
+    sistema.Adicionar_Conta_Corrente(conta_corrente)
     sistema.Adicionar_Conta_Poupanca(conta_poupanca)
     
     print()
     # conta_corrente.Info_Conta()
-    conta_poupanca.Info_Conta()
+    # conta_poupanca.Info_Conta()
     
-    print()
-    conta_poupanca.Saque(100)
+    # print()
+    # conta_poupanca.Saque(100)
 
 #* Interface
 
