@@ -14,8 +14,47 @@ class Banco:
         self._numero = numero
         
         # Lista de contas bancárias
-        self.contas = []
+        self._contas = []
     
+    # Getters
+    @property
+    def nome(self):
+        return self._nome
+    
+    @property
+    def cnpj(self):
+        return self._cnpj
+
+    @property
+    def numero(self):
+        return self._numero
+
+    @property
+    def contas(self):
+        return self._contas
+    
+    # Setters
+    @nome.setter
+    def nome(self, other):
+        if other:
+            self.nome = other
+    
+    @cnpj.setter
+    def cnpj(self, other):
+        if other:
+            self.cnpj = other
+    
+    @numero.setter
+    def numero(self, other):
+        if other:
+            self.numero = other
+    
+    @contas.setter
+    def contas(self, other):
+        if other:
+            self.contas = other
+    
+    # Métodos
     @classmethod
     def Construtor_Banco_Teclado(cls):
         print("Digite o nome do Banco")
@@ -58,8 +97,38 @@ class Pessoa:
         self._cpf = cpf
         
         # Lista de contas bancárias
-        self.contas = []
+        self._contas = []
     
+    # Getters
+    @property
+    def idade(self):
+        return self._idade
+    
+    @property
+    def cpf(self):
+        return self._cpf
+
+    @property
+    def contas(self):
+        return self._contas
+    
+    # Setters
+    @idade.setter
+    def idade(self, other):
+        if other:
+            self.idade = other
+    
+    @cpf.setter
+    def cpf(self, other):
+        if other:
+            self.cpf = other
+    
+    @contas.setter
+    def contas(self, other):
+        if other:
+            self.contas = other
+    
+    # Métodos
     @classmethod
     def Construtor_Pessoa_Teclado(cls):
         print("Digite o primeiro nome da Pessoa")
@@ -164,9 +233,13 @@ class Conta_Bancaria:
         print(f"Senha: {self.senha}")
     
     def Saque(self, other: float):
-        self.saldo -= other
-        print(f"Saque: R$ {other:.2f}")
+        print("\nMétodo de saque")
+        print(f"Valor: {other}")
         print(f"Saldo: {self.saldo}")
+        
+        self.saldo = (self.saldo - other)
+        # print(f"Saque: R$ {other:.2f}")
+        # print(f"Saldo: {self.saldo}")
     
     def Deposito(self, other: float):
         self.saldo += other
@@ -183,6 +256,15 @@ class Conta_Corrente(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, taxa):
         super().__init__(titular, banco, numero, saldo, senha)
         self._taxa = taxa
+
+    @property
+    def taxa(self):
+        return self._taxa
+    
+    @taxa.setter
+    def taxa(self, other):
+        if other:
+            self.taxa = other
 
     @classmethod
     def Construtor_Conta_Corrente_Teclado(cls, sistema):
@@ -266,7 +348,7 @@ class Conta_Corrente(Conta_Bancaria):
     
     def Info_Conta(self):
         print("-"*15)
-        print("Conta Corrente")
+        print("Conta Corrente\n")
         super().Info()
         print(f"Taxa Mensal: R$ {self._taxa:.2f}")
     
@@ -280,8 +362,27 @@ class Conta_Poupanca(Conta_Bancaria):
         super().__init__(titular, banco, numero, saldo, senha)
         self._rendimento = rendimento
         self._total_saques = total_saques
+
+    # Getters
+    @property
+    def rendimento(self):
+        return self._rendimento
     
-    #TODO Corrigir | assimilar à de conta_corrente
+    @property
+    def total_saques(self):
+        return self._total_saques
+
+    # Setters
+    @rendimento.setter
+    def rendimento(self, other):
+        if other:
+            self.rendimento = other
+    
+    @total_saques.setter
+    def total_saques(self, other):
+        if other:
+            self.rendimento = other
+
     @classmethod
     def Construtor_Conta_Poupanca_Teclado(cls, sistema):
         # Flags para quando um valor correto for encontrado
@@ -364,7 +465,7 @@ class Conta_Poupanca(Conta_Bancaria):
     
     def Info_Conta(self):
         print("-"*15)
-        print("Conta Poupança")
+        print("Conta Poupança\n")
         super().Info()
         print(f"Rendimento: {self._rendimento}%")
         print(f"Total de saques: {self._total_saques}")
@@ -607,18 +708,30 @@ def Cadastro_Conta(sistema):
                 Continuar()
                 continue
 
-def Saque(sistema, tipo_conta):
+def Sacar(sistema, tipo_conta):
     running = True
 
     while running:
+        print("-"*30)
         print("Informe o número da conta")
         numero_conta = Entrada_De_Dado(0)
         
-        conta_existe = sistema.Verificar_Conta_Poupanca_Existe(numero_conta)
+        if tipo_conta == "corrente":
+            conta_existe = sistema.Verificar_Conta_Corrente_Existe(numero_conta)
+        elif tipo_conta == "poupanca":
+            conta_existe = sistema.Verificar_Conta_Poupanca_Existe(numero_conta)
         
         if conta_existe:
-            conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
+            print("Conta existe")
             
+            if tipo_conta == "corrente":
+                conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
+            elif tipo_conta == "poupanca":
+                conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
+            
+            print(f"Saldo: {conta.saldo}")
+            
+            print("\nDigite o valor do saque")
             valor = Entrada_De_Dado(0.00)
             
             if valor <= 0:
@@ -626,11 +739,21 @@ def Saque(sistema, tipo_conta):
                 print("O valor do saque deve ser positivo.")
                 Continuar()
                 continue
+            else:
+                print("Sacando...\n")
+                conta.Saque(valor)
+        else:
+            print("-"*30)
+            print("Esta conta não existe no sistema.")
+            print("Cancelando o saque...")
+            Continuar()
+            running = False
 
 def Escolher_Saque(sistema): #TODO Em desenvolvimento
     running = True
 
     while running:
+        print("-"*30)
         print("Informe o tipo da conta:")
         print("1 - Corrente")
         print("2 - Poupança")
@@ -645,7 +768,11 @@ def Escolher_Saque(sistema): #TODO Em desenvolvimento
                 Continuar()
                 running = False
             elif escolha == 1:
-                Saque(sistema, "corrente")
+                Sacar(sistema, "corrente")
+                running = False
+            elif escolha == 2:
+                Sacar(sistema, "poupanca")
+                running = False
             
         except ValueError:
             print("-"*30)
@@ -875,18 +1002,22 @@ def Continuar():
 
 # Função de teste | Será removida
 def test(sistema):
+    
     banco = Banco("banco", "123456", 123)
     pessoa = Pessoa("fulano", "Fulano", 23, "0123456")
     conta_corrente = Conta_Corrente(pessoa, banco, 456, 700, 456, 50)
-    conta_poupanca = Conta_Poupanca(pessoa, banco, 789, 500, 789, 25)
+    # conta_poupanca = Conta_Poupanca(pessoa, banco, 789, 500, 789, 25)
     
     sistema.Adicionar_Banco(banco)
     sistema.Adicionar_Pessoa(pessoa)
     sistema.Adicionar_Conta_Corrente(conta_corrente)
-    sistema.Adicionar_Conta_Poupanca(conta_poupanca)
+    # sistema.Adicionar_Conta_Poupanca(conta_poupanca)
     
-    # conta_corrente.Info_Conta()
+    print()
+    conta_corrente.Info_Conta()
     # conta_poupanca.Info_Conta()
+    
+    conta_corrente.Saque(100)
 
 #* Interface
 
@@ -922,7 +1053,7 @@ if __name__ == '__main__':
             elif escolha == 2:
                 Menu_Info(sistema)
             elif escolha == 3:
-                Saque()
+                Escolher_Saque(sistema)
             
             elif escolha == 0:
                 print("-"*30)
