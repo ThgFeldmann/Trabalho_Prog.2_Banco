@@ -3,7 +3,7 @@
 # 'Banco,{banco}'
 # 'Conta Corrente,{conta}'
 # 'Conta Poupança,{conta}'
-#TODO Criar funções para saques e depósitos
+#TODO Criar função para depósitos
 #TODO Criar os métodos alternativos
 
 #* Classes
@@ -37,22 +37,22 @@ class Banco:
     # Setters
     @nome.setter
     def nome(self, other):
-        if other:
+        if other is not None:
             self._nome = other
     
     @cnpj.setter
     def cnpj(self, other):
-        if other:
+        if other is not None:
             self._cnpj = other
     
     @numero.setter
     def numero(self, other):
-        if other:
+        if other is not None:
             self._numero = other
     
     @contas.setter
     def contas(self, other):
-        if other:
+        if other is not None:
             self._contas = other
     
     # Métodos
@@ -116,17 +116,17 @@ class Pessoa:
     # Setters
     @idade.setter
     def idade(self, other):
-        if other:
+        if other is not None:
             self._idade = other
     
     @cpf.setter
     def cpf(self, other):
-        if other:
+        if other is not None:
             self._cpf = other
     
     @contas.setter
     def contas(self, other):
-        if other:
+        if other is not None:
             self._contas = other
     
     # Métodos
@@ -201,27 +201,27 @@ class Conta_Bancaria:
     
     @titular.setter
     def titular(self, other):
-        if other:
+        if other is not None:
             self.__titular = other
     
     @banco.setter
     def banco(self, other):
-        if other:
+        if other is not None:
             self.__banco = other
     
     @numero.setter
     def numero(self, other):
-        if other:
+        if other is not None:
             self.__numero = other
     
     @saldo.setter
     def saldo(self, other):
-        if other:
+        if other is not None:
             self.__saldo = other
     
     @senha.setter
     def senha(self, other):
-        if other:
+        if other is not None:
             self.__senha = other
     
     # Métodos
@@ -234,21 +234,67 @@ class Conta_Bancaria:
         print(f"Senha: {self.senha}")
     
     def Saque(self, other: float):
-        resultado = self.saldo - other
-        self.saldo = resultado
+        self.saldo = self.saldo - other
         print(f"Saque: R$ {other:.2f}")
-        print(f"Saldo: {self.saldo}")
+        print(f"Saldo: R$ {self.saldo:.2f}")
+    
+    def Saque_Com_Entrada(self):
+        running = True
+
+        while running:
+            print(f"Saldo: {self.saldo}")
+            
+            print("\nDigite o valor do saque")
+            valor = Entrada_De_Dado(0.00)
+            
+            if valor <= 0:
+                print("-"*30)
+                print("O valor do saque deve ser positivo.")
+                Continuar()
+                continue
+            else:
+                print("Sacando...\n")
+                self.Saque(valor)
+                Continuar()
+                running = False
     
     def Deposito(self, other: float):
         self.saldo += other
-        print(f"Depósito: ${other:.2f}")
-        print(f"Saldo: {self.saldo}")
+        print(f"Depósito: R${other:.2f}")
+        print(f"Saldo: R$ {self.saldo:.2f}")
+    
+    def Deposito_Com_Entrada(self):
+        running = True
+
+        while running:
+            print(f"Saldo: {self.saldo}")
+            
+            print("\nDigite o valor do depósito")
+            valor = Entrada_De_Dado(0.00)
+            
+            if valor <= 0:
+                print("-"*30)
+                print("O valor do depósito deve ser positivo.")
+                Continuar()
+                continue
+            else:
+                print("Depositando...\n")
+                self.Deposito(valor)
+                Continuar()
+                running = False
     
     def Verifica_Senha(self, other: str):
         if self.senha == other:
             return True
         else:
             return False
+
+    def Verifica_Senha_Com_Entrada(self):
+        print("\nDigite a senha da conta")
+        senha_inserida = Entrada_De_Dado("")
+        senha_valida = self.Verifica_Senha(senha_inserida)
+        
+        return senha_valida
 
 class Conta_Corrente(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, taxa):
@@ -261,7 +307,7 @@ class Conta_Corrente(Conta_Bancaria):
     
     @taxa.setter
     def taxa(self, other):
-        if other:
+        if other is not None:
             self._taxa = other
 
     @classmethod
@@ -373,12 +419,12 @@ class Conta_Poupanca(Conta_Bancaria):
     # Setters
     @rendimento.setter
     def rendimento(self, other):
-        if other:
+        if other is not None:
             self._rendimento = other
     
     @total_saques.setter
     def total_saques(self, other):
-        if other:
+        if other is not None:
             self._total_saques = other
 
     @classmethod
@@ -480,6 +526,15 @@ class Conta_Poupanca(Conta_Bancaria):
             super().Saque(other)
             self.total_saques -= 1
         
+        else:
+            print("-"*30)
+            print("Não foi possível efetuar este saque.")
+            print("Não há mais saques disponíveis.")
+    
+    def Saque_Com_Entrada(self):
+        if self.total_saques <= 3 and self.total_saques > 0:
+            super().Saque_Com_Entrada()
+            self.total_saques -= 1
         else:
             print("-"*30)
             print("Não foi possível efetuar este saque.")
@@ -710,26 +765,8 @@ def Cadastro_Conta(sistema):
                 Continuar()
                 continue
 
-def Sacar(sistema, conta):
-    running = True
-
-    while running:
-        print(f"Saldo: {conta.saldo}")
-        
-        print("\nDigite o valor do saque")
-        valor = Entrada_De_Dado(0.00)
-        
-        if valor <= 0:
-            print("-"*30)
-            print("O valor do saque deve ser positivo.")
-            Continuar()
-            continue
-        else:
-            print("Sacando...\n")
-            conta.Saque(valor)
-
-# Função que verifica se uma conta existe, e pede a senha, se válida, realiza a função de saque
-def Verifica_Senha(sistema):
+# Função que verifica se uma conta existe, e pede a senha
+def Pre_Saque(sistema):
     running = True
 
     while running:
@@ -751,10 +788,7 @@ def Verifica_Senha(sistema):
                 verificando_senha = True
                 
                 while verificando_senha:
-                    print("\nDigite a senha da conta")
-                    senha_inserida = Entrada_De_Dado("")
-                    
-                    senha_valida = conta.Verifica_Senha(senha_inserida)
+                    senha_valida = conta.Verifica_Senha_Com_Entrada()
                     
                     if not senha_valida:
                         print("-"*30)
@@ -764,7 +798,7 @@ def Verifica_Senha(sistema):
                     else:
                         print("-"*30)
                         print("Senha correta, continuando com o saque...\n")
-                        Sacar(sistema, conta)
+                        conta.Saque_Com_Entrada()
                         verificando_senha = False
                         running = False
         except ValueError:
@@ -779,6 +813,40 @@ def Verifica_Senha(sistema):
             Continuar()
             continue
 
+def Pre_Deposito(sistema):
+    running = True
+
+    while running:
+        print("-"*30)
+        print("Depósito\n")
+        
+        conta = Escolher_Tipo_Conta(sistema)
+        
+        if not conta:
+            print("-"*30)
+            print("Não existe uma conta com este número no sistema, tente novamente.")
+            Continuar()
+            continue
+        else:
+            verificando_senha = True
+
+            while verificando_senha:
+                senha_valida = conta.Verifica_Senha_Com_Entrada()
+                
+                if not senha_valida:
+                    print("-"*30)
+                    print("Senha inválida, tente novamente.")
+                    Continuar()
+                    continue
+                else:
+                    print("-"*30)
+                    print("Senha correta, continuando com o depósito...\n")
+                    conta.Deposito_Com_Entrada()
+                    verificando_senha = False
+                    running = False
+
+# Função que pergunta ao usuário qual o tipo da conta a ser trabalhada, verifica se existe e retorna a conta
+# Retorna uma conta (Corrente ou Poupança)
 def Escolher_Tipo_Conta(sistema):
     running = True
     
@@ -792,7 +860,7 @@ def Escolher_Tipo_Conta(sistema):
             print()
             escolha = Entrada_De_Dado(0)
             
-            print("Digite o número da conta")
+            print("\nDigite o número da conta")
             numero_conta = Entrada_De_Dado(0)
             
             if escolha <= 0:
@@ -1046,10 +1114,14 @@ def test(sistema):
     
     print()
     # conta_corrente.Info_Conta()
-    # conta_poupanca.Info_Conta()
+    conta_poupanca.Info_Conta()
+    
+    print()
+    # conta_poupanca.Saque(100)
+    # conta_corrente.Deposito(100)
     
     # print()
-    # conta_poupanca.Saque(100)
+    # conta_corrente.Info_Conta()
 
 #* Interface
 
@@ -1085,9 +1157,9 @@ if __name__ == '__main__':
             elif escolha == 2:
                 Menu_Info(sistema)
             elif escolha == 3:
-                Verifica_Senha(sistema)
+                Pre_Saque(sistema)
             elif escolha == 4:
-                print("Depósito")
+                Pre_Deposito(sistema)
             elif escolha == 5:
                 print("Novo Mês")
             
