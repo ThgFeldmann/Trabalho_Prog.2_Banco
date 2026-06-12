@@ -3,7 +3,7 @@
 # 'Banco,{banco}'
 # 'Conta Corrente,{conta}'
 # 'Conta Poupança,{conta}'
-#TODO Banco e Pessoas devem ter as contas salvas
+#TODO Banco e Pessoas devem ter as contas salvas | E vice-versa
 #TODO Implementação com o arquivo (Atualizar, Carregar)
 #TODO Ao executar o sistema deve carregar o arquivo automaticamente
 
@@ -771,6 +771,12 @@ def Cadastro_Conta(sistema):
                     conta = Conta_Corrente.Construtor_Conta_Corrente_Teclado(sistema)
                     
                     try:
+                        banco = conta.banco
+                        banco.Adicionar_Conta(conta)
+                        
+                        pessoa = conta.titular
+                        pessoa.Adicionar_Conta(conta)
+                        
                         sistema.Adicionar_Conta_Corrente(conta)
                         running = False
                         return True
