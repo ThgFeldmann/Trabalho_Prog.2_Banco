@@ -3,7 +3,7 @@
 # 'Banco,{banco}'
 # 'Conta Corrente,{conta}'
 # 'Conta Poupança,{conta}'
-#TODO Saque em contas correntes também
+#TODO Banco e Pessoas devem ter as contas salvas
 #TODO Implementação com o arquivo (Atualizar, Carregar)
 #TODO Ao executar o sistema deve carregar o arquivo automaticamente
 
@@ -400,6 +400,12 @@ class Conta_Corrente(Conta_Bancaria):
         self.saldo = (self.saldo - self.taxa)
         print(f"Taxa Mensal: R$ {self.taxa:.2f}")
         print(f"Saldo: R$ {self.saldo:.2f}")
+
+    def Saque(self, other):
+        super().Saque(other)
+    
+    def Saque_Com_Entrada(self):
+        super().Saque_Com_Entrada()
 
 class Conta_Poupanca(Conta_Bancaria):
     def __init__(self, titular, banco, numero, saldo, senha, rendimento, total_saques=3):
@@ -1022,48 +1028,33 @@ def Pre_Saque(sistema):
 
     while running:
         print("-"*30)
-        print("Saque de uma conta poupança\n")
+        print("Saque\n")
         
-        try:
-            print("Digite o número da conta")
-            numero_conta = Entrada_De_Dado(0)
-            
-            conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
-            
-            if not conta:
-                print("-"*30)
-                print("Não existe uma conta com este número no sistema, tente novamente.")
-                Continuar()
-                continue
-            else:
-                verificando_senha = True
+        conta = Escolher_Tipo_Conta(sistema)
+        
+        if not conta:
+            print("-"*30)
+            print("Não existe uma conta com este número no sistema, tente novamente.")
+            Continuar()
+            continue
+        else:
+            verificando_senha = True
+
+            while verificando_senha:
+                senha_valida = conta.Verifica_Senha_Com_Entrada()
                 
-                while verificando_senha:
-                    senha_valida = conta.Verifica_Senha_Com_Entrada()
-                    
-                    if not senha_valida:
-                        print("-"*30)
-                        print("Senha inválida, tente novamente.")
-                        Continuar()
-                        continue
-                    else:
-                        print("-"*30)
-                        print("Senha correta, continuando com o saque...\n")
-                        conta.Saque_Com_Entrada()
-                        Continuar()
-                        verificando_senha = False
-                        running = False
-        except ValueError:
-            print("-"*30)
-            print("O número da conta deve conter apenas números positivos")
-            Continuar()
-            continue
-        except Exception as error:
-            print("-"*30)
-            print("Ocorreu um erro inesperado, tente novamente.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
-            continue
+                if not senha_valida:
+                    print("-"*30)
+                    print("Senha inválida, tente novamente.")
+                    Continuar()
+                    continue
+                else:
+                    print("-"*30)
+                    print("Senha correta, continuando com o Saque...\n")
+                    conta.Saque_Com_Entrada()
+                    Continuar()
+                    verificando_senha = False
+                    running = False
 
 # Função que realiza o procedimento pré-depósito
 def Pre_Deposito(sistema):
