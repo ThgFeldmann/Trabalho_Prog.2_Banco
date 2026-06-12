@@ -687,6 +687,52 @@ def Entrada_De_Dado(tipo):
         else:
             running = False
 
+# Função que pergunta ao usuário qual o tipo da conta a ser trabalhada, verifica se existe e retorna a conta
+# Retorna uma conta (Corrente ou Poupança), dependendo do usuário
+def Escolher_Tipo_Conta(sistema):
+    running = True
+    
+    while running:
+        print("-"*30)
+        print("Informe o tipo da conta")
+        print("1 - Corrente")
+        print("2 - Poupança")
+        
+        try:
+            print()
+            escolha = Entrada_De_Dado(0)
+            
+            print("\nDigite o número da conta")
+            numero_conta = Entrada_De_Dado(0)
+            
+            if escolha <= 0:
+                raise ValueError
+            elif escolha == 1:
+                conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
+                running = False
+                return conta
+            elif escolha == 2:
+                conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
+                running = False
+                return conta
+            else:
+                print("-"*30)
+                print("Opção inválida, tente novamente.")
+                Continuar()
+                continue
+        except ValueError:
+            print("-"*30)
+            print("A entrada deve conter apenas números positivos")
+            Continuar()
+            continue
+        except Exception as error:
+            print("-"*30)
+            print("Ocorreu um erro inesperado, tente novamente.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+            continue
+
+# Função que cuida do cadastro de uma conta
 def Cadastro_Conta(sistema):
     if len(sistema.pessoas) <= 0:
         print("-"*30)
@@ -765,165 +811,6 @@ def Cadastro_Conta(sistema):
                 print(f"Mensagem de erro: {error}")
                 Continuar()
                 continue
-
-# Função que verifica se uma conta existe, e pede a senha
-def Pre_Saque(sistema):
-    running = True
-
-    while running:
-        print("-"*30)
-        print("Saque de uma conta poupança\n")
-        
-        try:
-            print("Digite o número da conta")
-            numero_conta = Entrada_De_Dado(0)
-            
-            conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
-            
-            if not conta:
-                print("-"*30)
-                print("Não existe uma conta com este número no sistema, tente novamente.")
-                Continuar()
-                continue
-            else:
-                verificando_senha = True
-                
-                while verificando_senha:
-                    senha_valida = conta.Verifica_Senha_Com_Entrada()
-                    
-                    if not senha_valida:
-                        print("-"*30)
-                        print("Senha inválida, tente novamente.")
-                        Continuar()
-                        continue
-                    else:
-                        print("-"*30)
-                        print("Senha correta, continuando com o saque...\n")
-                        conta.Saque_Com_Entrada()
-                        Continuar()
-                        verificando_senha = False
-                        running = False
-        except ValueError:
-            print("-"*30)
-            print("O número da conta deve conter apenas números positivos")
-            Continuar()
-            continue
-        except Exception as error:
-            print("-"*30)
-            print("Ocorreu um erro inesperado, tente novamente.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
-            continue
-
-def Pre_Deposito(sistema):
-    running = True
-
-    while running:
-        print("-"*30)
-        print("Depósito\n")
-        
-        conta = Escolher_Tipo_Conta(sistema)
-        
-        if not conta:
-            print("-"*30)
-            print("Não existe uma conta com este número no sistema, tente novamente.")
-            Continuar()
-            continue
-        else:
-            verificando_senha = True
-
-            while verificando_senha:
-                senha_valida = conta.Verifica_Senha_Com_Entrada()
-                
-                if not senha_valida:
-                    print("-"*30)
-                    print("Senha inválida, tente novamente.")
-                    Continuar()
-                    continue
-                else:
-                    print("-"*30)
-                    print("Senha correta, continuando com o depósito...\n")
-                    conta.Deposito_Com_Entrada()
-                    Continuar()
-                    verificando_senha = False
-                    running = False
-
-def Passar_Mes(sistema):
-    running = True
-
-    while running:
-        print("-"*30)
-        print("Passagem do mês")
-        conta = Escolher_Tipo_Conta(sistema)
-        
-        if not conta:
-            print("-"*30)
-            print("Não existe uma conta com este número no sistema, tente novamente.")
-            Continuar()
-            continue
-        else:
-            verificando_senha = True
-
-            while verificando_senha:
-                senha_valida = conta.Verifica_Senha_Com_Entrada()
-                
-                if not senha_valida:
-                    print("-"*30)
-                    print("Senha inválida, tente novamente.")
-                    Continuar()
-                    continue
-                else:
-                    print("-"*30)
-                    print("Senha correta, continuando com o passar do mês...\n")
-                    conta.Novo_Mes()
-                    Continuar()
-                    verificando_senha = False
-                    running = False
-
-# Função que pergunta ao usuário qual o tipo da conta a ser trabalhada, verifica se existe e retorna a conta
-# Retorna uma conta (Corrente ou Poupança), dependendo do usuário
-def Escolher_Tipo_Conta(sistema):
-    running = True
-    
-    while running:
-        print("-"*30)
-        print("Informe o tipo da conta")
-        print("1 - Corrente")
-        print("2 - Poupança")
-        
-        try:
-            print()
-            escolha = Entrada_De_Dado(0)
-            
-            print("\nDigite o número da conta")
-            numero_conta = Entrada_De_Dado(0)
-            
-            if escolha <= 0:
-                raise ValueError
-            elif escolha == 1:
-                conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
-                running = False
-                return conta
-            elif escolha == 2:
-                conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
-                running = False
-                return conta
-            else:
-                print("-"*30)
-                print("Opção inválida, tente novamente.")
-                Continuar()
-                continue
-        except ValueError:
-            print("-"*30)
-            print("A entrada deve conter apenas números positivos")
-            Continuar()
-            continue
-        except Exception as error:
-            print("-"*30)
-            print("Ocorreu um erro inesperado, tente novamente.")
-            print(f"Mensagem de erro: {error}")
-            Continuar()
-            continue
 
 # Função para o menu de cadastros
 def Menu_Cadastro(sistema):
@@ -1128,6 +1015,122 @@ def Menu_Info(sistema):
             print(f"Mensagem de erro: {error}")
             Continuar()
             continue
+
+# Função que realiza o procedimento pré-saque
+def Pre_Saque(sistema):
+    running = True
+
+    while running:
+        print("-"*30)
+        print("Saque de uma conta poupança\n")
+        
+        try:
+            print("Digite o número da conta")
+            numero_conta = Entrada_De_Dado(0)
+            
+            conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
+            
+            if not conta:
+                print("-"*30)
+                print("Não existe uma conta com este número no sistema, tente novamente.")
+                Continuar()
+                continue
+            else:
+                verificando_senha = True
+                
+                while verificando_senha:
+                    senha_valida = conta.Verifica_Senha_Com_Entrada()
+                    
+                    if not senha_valida:
+                        print("-"*30)
+                        print("Senha inválida, tente novamente.")
+                        Continuar()
+                        continue
+                    else:
+                        print("-"*30)
+                        print("Senha correta, continuando com o saque...\n")
+                        conta.Saque_Com_Entrada()
+                        Continuar()
+                        verificando_senha = False
+                        running = False
+        except ValueError:
+            print("-"*30)
+            print("O número da conta deve conter apenas números positivos")
+            Continuar()
+            continue
+        except Exception as error:
+            print("-"*30)
+            print("Ocorreu um erro inesperado, tente novamente.")
+            print(f"Mensagem de erro: {error}")
+            Continuar()
+            continue
+
+# Função que realiza o procedimento pré-depósito
+def Pre_Deposito(sistema):
+    running = True
+
+    while running:
+        print("-"*30)
+        print("Depósito\n")
+        
+        conta = Escolher_Tipo_Conta(sistema)
+        
+        if not conta:
+            print("-"*30)
+            print("Não existe uma conta com este número no sistema, tente novamente.")
+            Continuar()
+            continue
+        else:
+            verificando_senha = True
+
+            while verificando_senha:
+                senha_valida = conta.Verifica_Senha_Com_Entrada()
+                
+                if not senha_valida:
+                    print("-"*30)
+                    print("Senha inválida, tente novamente.")
+                    Continuar()
+                    continue
+                else:
+                    print("-"*30)
+                    print("Senha correta, continuando com o depósito...\n")
+                    conta.Deposito_Com_Entrada()
+                    Continuar()
+                    verificando_senha = False
+                    running = False
+
+# Função que realiza o procedimento de passar o mês para uma conta
+def Passar_Mes(sistema):
+    running = True
+
+    while running:
+        print("-"*30)
+        print("Passagem do mês")
+        conta = Escolher_Tipo_Conta(sistema)
+        
+        if not conta:
+            print("-"*30)
+            print("Não existe uma conta com este número no sistema, tente novamente.")
+            Continuar()
+            continue
+        else:
+            verificando_senha = True
+
+            while verificando_senha:
+                senha_valida = conta.Verifica_Senha_Com_Entrada()
+                
+                if not senha_valida:
+                    print("-"*30)
+                    print("Senha inválida, tente novamente.")
+                    Continuar()
+                    continue
+                else:
+                    print("-"*30)
+                    print("Senha correta, continuando com o passar do mês...\n")
+                    conta.Novo_Mes()
+                    Continuar()
+                    verificando_senha = False
+                    running = False
 
 def Continuar():
     print("-"*30)
