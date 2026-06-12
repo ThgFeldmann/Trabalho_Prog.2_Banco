@@ -3,8 +3,6 @@
 # 'Banco,{banco}'
 # 'Conta Corrente,{conta}'
 # 'Conta Poupança,{conta}'
-#TODO Criar função para depósitos
-#TODO Criar os métodos alternativos
 
 #* Classes
 
