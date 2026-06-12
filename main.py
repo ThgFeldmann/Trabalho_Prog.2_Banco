@@ -792,20 +792,24 @@ def Escolher_Tipo_Conta(sistema):
             print()
             escolha = Entrada_De_Dado(0)
             
+            print("Digite o número da conta")
+            numero_conta = Entrada_De_Dado(0)
+            
             if escolha <= 0:
                 raise ValueError
             elif escolha == 1:
+                conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
                 running = False
-                return "corrente"
+                return conta
             elif escolha == 2:
+                conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
                 running = False
-                return "poupanca"
+                return conta
             else:
                 print("-"*30)
                 print("Opção inválida, tente novamente.")
                 Continuar()
                 continue
-            
         except ValueError:
             print("-"*30)
             print("A entrada deve conter apenas números positivos")
@@ -983,18 +987,8 @@ def Menu_Info(sistema):
                     Continuar()
                     continue
             elif escolha == 3: # Conta
-                tipo = Escolher_Tipo_Conta(sistema)
-                
-                print("-"*30)
                 try:
-                    print("Digite o número da conta")
-                    numero_conta = Entrada_De_Dado(0)
-                    
-                    if tipo == "corrente":
-                        conta = sistema.Busca_Conta_Corrente_Por_Numero(numero_conta)
-                    elif tipo == "poupanca":
-                        conta = sistema.Busca_Conta_Poupanca_Por_Numero(numero_conta)
-                    
+                    conta = Escolher_Tipo_Conta(sistema)
                     if not conta:
                         print("-"*30)
                         print("Esta conta não existe no sistema.")
@@ -1074,7 +1068,7 @@ if __name__ == '__main__':
         print("2 - Informações")
         print("3 - Sacar de uma conta")
         print("4 - Depositar em uma conta")
-        print("5 - Cobrar taxa de uma conta")
+        print("5 - Passar o mês")
         print("0 - Sair")
 
         try:
@@ -1092,6 +1086,10 @@ if __name__ == '__main__':
                 Menu_Info(sistema)
             elif escolha == 3:
                 Verifica_Senha(sistema)
+            elif escolha == 4:
+                print("Depósito")
+            elif escolha == 5:
+                print("Novo Mês")
             
             elif escolha == 0:
                 print("-"*30)
