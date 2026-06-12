@@ -3,6 +3,9 @@
 # 'Banco,{banco}'
 # 'Conta Corrente,{conta}'
 # 'Conta Poupança,{conta}'
+#TODO Saque em contas correntes também
+#TODO Implementação com o arquivo (Atualizar, Carregar)
+#TODO Ao executar o sistema deve carregar o arquivo automaticamente
 
 #* Classes
 
@@ -253,7 +256,6 @@ class Conta_Bancaria:
             else:
                 print("Sacando...\n")
                 self.Saque(valor)
-                Continuar()
                 running = False
     
     def Deposito(self, other: float):
@@ -278,7 +280,6 @@ class Conta_Bancaria:
             else:
                 print("Depositando...\n")
                 self.Deposito(valor)
-                Continuar()
                 running = False
     
     def Verifica_Senha(self, other: str):
@@ -395,8 +396,9 @@ class Conta_Corrente(Conta_Bancaria):
         print(f"Taxa Mensal: R$ {self._taxa:.2f}")
     
     def Novo_Mes(self):
-        self.saldo -= self.taxa
-        print(f"Taxa Mensal: R$ {self._taxa:.2f}")
+        print(f"Saldo: R$ {self.saldo:.2f}")
+        self.saldo = (self.saldo - self.taxa)
+        print(f"Taxa Mensal: R$ {self.taxa:.2f}")
         print(f"Saldo: R$ {self.saldo:.2f}")
 
 class Conta_Poupanca(Conta_Bancaria):
@@ -513,16 +515,17 @@ class Conta_Poupanca(Conta_Bancaria):
         print(f"Total de saques: {self._total_saques}")
     
     def Novo_Mes(self):
-        self._saldo += (self._rendimento * self._saldo)
+        self.saldo += (self.saldo * self.rendimento)
         self.total_saques = 3
-        print(f"Rendimento: {self._rendimento}%")
-        print(f"Saldo: R$ {self._saldo:.2f}")
+        print(f"Rendimento: {self.rendimento}%")
+        print(f"Saldo: R$ {self.saldo:.2f}")
         print(f"Total de saques: {self.total_saques}")
     
     def Saque(self, other):
         if self.total_saques <= 3 and self.total_saques > 0:
             super().Saque(other)
-            self.total_saques -= 1
+            self.total_saques = self.total_saques - 1
+            print(f"Total de saques: {self.total_saques}")
         
         else:
             print("-"*30)
@@ -532,7 +535,7 @@ class Conta_Poupanca(Conta_Bancaria):
     def Saque_Com_Entrada(self):
         if self.total_saques <= 3 and self.total_saques > 0:
             super().Saque_Com_Entrada()
-            self.total_saques -= 1
+        
         else:
             print("-"*30)
             print("Não foi possível efetuar este saque.")
@@ -797,6 +800,7 @@ def Pre_Saque(sistema):
                         print("-"*30)
                         print("Senha correta, continuando com o saque...\n")
                         conta.Saque_Com_Entrada()
+                        Continuar()
                         verificando_senha = False
                         running = False
         except ValueError:
@@ -840,11 +844,44 @@ def Pre_Deposito(sistema):
                     print("-"*30)
                     print("Senha correta, continuando com o depósito...\n")
                     conta.Deposito_Com_Entrada()
+                    Continuar()
+                    verificando_senha = False
+                    running = False
+
+def Passar_Mes(sistema):
+    running = True
+
+    while running:
+        print("-"*30)
+        print("Passagem do mês")
+        conta = Escolher_Tipo_Conta(sistema)
+        
+        if not conta:
+            print("-"*30)
+            print("Não existe uma conta com este número no sistema, tente novamente.")
+            Continuar()
+            continue
+        else:
+            verificando_senha = True
+
+            while verificando_senha:
+                senha_valida = conta.Verifica_Senha_Com_Entrada()
+                
+                if not senha_valida:
+                    print("-"*30)
+                    print("Senha inválida, tente novamente.")
+                    Continuar()
+                    continue
+                else:
+                    print("-"*30)
+                    print("Senha correta, continuando com o passar do mês...\n")
+                    conta.Novo_Mes()
+                    Continuar()
                     verificando_senha = False
                     running = False
 
 # Função que pergunta ao usuário qual o tipo da conta a ser trabalhada, verifica se existe e retorna a conta
-# Retorna uma conta (Corrente ou Poupança)
+# Retorna uma conta (Corrente ou Poupança), dependendo do usuário
 def Escolher_Tipo_Conta(sistema):
     running = True
     
@@ -1111,7 +1148,7 @@ def test(sistema):
     sistema.Adicionar_Conta_Poupanca(conta_poupanca)
     
     print()
-    # conta_corrente.Info_Conta()
+    conta_corrente.Info_Conta()
     conta_poupanca.Info_Conta()
     
     print()
@@ -1138,7 +1175,7 @@ if __name__ == '__main__':
         print("2 - Informações")
         print("3 - Sacar de uma conta")
         print("4 - Depositar em uma conta")
-        print("5 - Passar o mês")
+        print("5 - Passar o mês para uma conta")
         print("0 - Sair")
 
         try:
@@ -1159,7 +1196,7 @@ if __name__ == '__main__':
             elif escolha == 4:
                 Pre_Deposito(sistema)
             elif escolha == 5:
-                print("Novo Mês")
+                Passar_Mes(sistema)
             
             elif escolha == 0:
                 print("-"*30)
